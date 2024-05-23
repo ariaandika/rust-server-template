@@ -1,5 +1,6 @@
 mod libs;
 mod routes;
+mod entity;
 
 #[tokio::main]
 async fn main() {
