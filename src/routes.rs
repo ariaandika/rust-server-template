@@ -10,8 +10,8 @@ pub fn routes() -> Router {
 fn users() -> Router {
     use crate::entity::users::query;
     Router::new()
-        .route("/login", post(query::login))
-        .route("/login/cookie", post(query::login_cookie))
+        .route("/login", post(query::login_handler))
+        .route("/register", post(query::register))
         .route("/session", get(query::session))
         .route("/session/admin", get(query::admin))
 }

@@ -70,10 +70,11 @@ impl RoleTrait for Sales {
 impl Users {
     pub async fn create_role_data(&self, db: &sqlx::PgPool) -> crate::libs::error::Result<Value> {
         match self.role {
-            Role::Admin => todo!(),
-            Role::Customer => todo!(),
+            Role::Admin => Ok(Value::Null),
+            Role::Customer => Ok(Value::Null),
             Role::Sales => {
-                let Some(sales) = sqlx::query_as::<_, Sales>("SELECT wh_id FROM employees WHERE user_id = $1")
+                let Some(sales) = sqlx::query_as::<_, Sales>(
+                "SELECT w.wh_id,w.name as wh_name FROM employees e LEFT JOIN warehouses w ON w.wh_id = e.wh_id WHERE user_id = $1")
                     .bind(self.user_id).fetch_optional(db).await?
                 else {
                     return Ok(Value::Null);
