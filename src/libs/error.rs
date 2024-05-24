@@ -6,6 +6,17 @@ pub struct Error(pub Response);
 pub type Result<T = Response> = std::result::Result<T, Error>;
 
 impl Error {
+    pub fn new(status: axum::http::StatusCode, error: &str, message: String) -> Self {
+        (
+            status, 
+            Json(serde_json::json!({ "error": error, "message": message }))
+        ).into_response().into()
+    }
+
+    pub fn from_status(status: axum::http::StatusCode, message: String) -> Self {
+        Self::new(status, status.canonical_reason().expect("status code with canonical_reason"), message)
+    }
+
     pub fn fatal<T>(value: T) -> Self where T: std::fmt::Display {
         eprintln!("{value}");
         Self((
@@ -13,6 +24,7 @@ impl Error {
             Self::msg("INTERNAL_SERVER_ERROR", "there is a problem with the server")
         ).into_response())
     }
+
     pub fn msg<M>(error: M, message: M) -> Json<serde_json::Value> where M: serde::Serialize {
         Json(serde_json::json!({ "error": error, "message": message }))
     }
